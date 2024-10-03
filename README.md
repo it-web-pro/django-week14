@@ -344,3 +344,61 @@ class SnippetDetail(APIView):
 ```
 
 10. ลองทดสอบดูด้วย Postman
+
+## Custom permissions
+
+สำหรับการทำ custom permission เราสามารถ override method `has_permission` และ `has_object_permission` ของ `BasePermission`
+
+- `.has_permission(self, request, view)`
+- `.has_object_permission(self, request, view, obj)`
+
+โดยการ return True หมายถึงผ่านการตรวจสอบ permission และ False หมายถึงไม่่ผ่าน
+
+เพิ่มเติมจากใน tutorial เราต้องการตรวจสอบ permission เพิ่มเติมดังนี้
+
+- method GET จะต้องมี permission `snippets.view_snippet`
+- method POST จะต้องมี permission `snippets.add_snippet`
+- method PUT จะต้องมี permission `snippets.change_snippet`
+- method DELETE จะต้องมี permission `snippets.delete_snippet`
+
+เราสามารถเขียน custom permission class ได้ดังตัวอย่าง
+
+```python
+from rest_framework.permissions import BasePermission
+
+class SnippetPermission(BasePermission):
+    """
+    Object-level permission to only allow owners of an object to edit and delete it.
+    """
+
+    def has_permission(self, request, view):
+        # SAFE_METHODS = GET, HEAD or OPTIONS
+        if request.method in permissions.SAFE_METHODS:
+            return request.user.has_perm("snippets.view_snippet")
+        elif request.method == "POST":
+            return request.user.has_perm("snippets.add_snippet")
+        elif request.method == "PUT":
+            return request.user.has_perm("snippets.change_snippet")
+        elif request.method == "DELETE":
+            return request.user.has_perm("snippets.delete_snippet")
+        return False
+    
+    def has_obj_permission(self, request, view, obj):
+        return obj.created_by == request.user
+```
+
+เพิ่ม `SnippetPermission` เข้าไปใน view
+
+```python
+...
+class SnippetList(APIView):
+    authentication_classes = [MyTokenAuthentication]
+    permission_classes = [IsAuthenticated, SnippetPermission]
+...
+class SnippetDetail(APIView):
+    authentication_classes = [MyTokenAuthentication]
+    permission_classes = [IsAuthenticated, SnippetPermission]
+...
+```
+
+**Note**: list ของ permission_classes จะ support & (and), | (or) and ~ (not) ดังตัวอย่าง `permission_classes = [IsAuthenticated|ReadOnly]` 
