@@ -386,7 +386,11 @@ class SnippetPermission(permissions.BasePermission):
         return False
     
     def has_obj_permission(self, request, view, obj):
-        return obj.created_by == request.user
+        if request.method == "PUT":
+            return request.user.has_perm("snippets.change_snippet") and obj.created_by == request.user
+        elif request.method == "DELETE":
+            return request.user.has_perm("snippets.delete_snippet") and obj.created_by == request.user
+        return False
 ```
 
 เพิ่ม `SnippetPermission` เข้าไปใน view
