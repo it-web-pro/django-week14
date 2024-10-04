@@ -364,9 +364,11 @@ class SnippetDetail(APIView):
 เราสามารถเขียน custom permission class ได้ดังตัวอย่าง
 
 ```python
-from rest_framework.permissions import BasePermission
+# snippets/permissions.py
 
-class SnippetPermission(BasePermission):
+from rest_framework import permissions
+
+class SnippetPermission(permissions.BasePermission):
     """
     Object-level permission to only allow owners of an object to edit and delete it.
     """
