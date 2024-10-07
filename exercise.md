@@ -57,4 +57,4 @@ class Appointment(models.Model):
 
 3. เพิ่มการตรวจสอบ permission - `IsAuthenticated` และ permission ของ model `Appointment` (0.5 คะแนน)
 
-4. เพิ่มการตรวจสอบ กรณี PUT/DELETE จะต้องตรวจสอบด้วยว่าผู้ทำเป็นเจ้าของ snippet นั้น `(request.user == snippet.created_by)` (0.5 คะแนน)
+4. เพิ่มการตรวจสอบ กรณี PUT/DELETE จะต้องตรวจสอบด้วยว่าผู้ทำเป็นเจ้าของ Appointment นั้น `(request.user == appointment.created_by)` (0.5 คะแนน)
