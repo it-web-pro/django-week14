@@ -385,7 +385,7 @@ class SnippetPermission(permissions.BasePermission):
             return request.user.has_perm("snippets.delete_snippet")
         return False
     
-    def has_obj_permission(self, request, view, obj):
+    def has_object_permission(self, request, view, obj):
         if request.method == "PUT":
             return request.user.has_perm("snippets.change_snippet") and obj.created_by == request.user
         elif request.method == "DELETE":
@@ -408,3 +408,43 @@ class SnippetDetail(APIView):
 ```
 
 **Note**: list ของ permission_classes จะ support & (and), | (or) and ~ (not) ดังตัวอย่าง `permission_classes = [IsAuthenticated|ReadOnly]` 
+
+สำหรับการตรวจสอบว่ากรณี "PUT" และ "DELETE" นั้นจะต้องเป็นเจ้าของถึงจะสามารถทำได้จะต้องไปเรียก `check_object_permissions(request, obj)` ก่อนเพื่อเข้าไปตรวจสอบ permission ใน `has_object_permission` ดังตัวอย่าง
+
+```python
+class SnippetDetail(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated, SnippetPermission]
+    """
+    Retrieve, update or delete a snippet instance.
+    """
+    def get_object(self, pk):
+        try:
+            return Snippet.objects.get(pk=pk)
+        except Snippet.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk):
+        snippet = self.get_object(pk)
+        serializer = SnippetSerializer(snippet)
+        return Response(serializer.data)
+
+    def put(self, request, pk):
+        snippet = self.get_object(pk)
+
+        self.check_object_permissions(request, snippet)
+
+        serializer = SnippetSerializer(snippet, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk):
+        snippet = self.get_object(pk)
+
+        self.check_object_permissions(request, snippet)
+    
+        snippet.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+```
