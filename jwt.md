@@ -37,7 +37,7 @@ Header จะถูกเข้ารหัสด้วย **Base64Url**
 
 Claims มีทั้งหมด 3 ประเภทได้แก่
 
-- **Reversed claims**: ซึ่งเป็นชื่อ properties ที่ถูกสงวนไว้ ยกตัวอย่างเช่น **iss** (issuer), **exp** (expiration time), **sub** (subject), **aud** (audience) - *ข้อมูลพวกนี้ไม่จำเป็น (not mandatory)*
+- **Resersed claims**: ซึ่งเป็นชื่อ properties ที่ถูกสงวนไว้ ยกตัวอย่างเช่น **iss** (issuer), **exp** (expiration time), **sub** (subject), **aud** (audience) - *ข้อมูลพวกนี้ไม่จำเป็น (not mandatory)*
 - **Public claims**: ซึ่งเป็นชื่อ properties ที่ถูกกำหนดไว้ใน list [IANA JSON Web Token Registry](https://www.iana.org/assignments/jwt/jwt.xhtml#claims)
 - **Private claims**: ซึ่งเป็นชื่อ properties ที่กำหนดเอง
 
